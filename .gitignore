@@ -1,0 +1,32 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# macOS files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
+
+# Environment variables / secrets
+.env
+
+# Personal AURORA data
+Memory/projects.json
+Memory/tasks.json
+Memory/moments.json
+Memory/workshop_journal.json
+Memory/workshop_sessions.json
+
+# Personal backups
+*backup*
+
+# Private workshop journal
+Docs/Workshop Journal.md

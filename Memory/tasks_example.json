@@ -1,0 +1,54 @@
+{
+    "tasks": [
+        {
+            "title": "Create Project Archive Interface",
+            "project": "AURORA",
+            "priority": "High",
+            "status": "Completed",
+            "created": "2026-07-01",
+            "due_date": "",
+            "completed": true,
+            "why": "Build a system for organizing and viewing project information.",
+            "notes": [
+                "Archive interface successfully implemented."
+            ]
+        },
+        {
+            "title": "Design Assistant Personality System",
+            "project": "AURORA",
+            "priority": "High",
+            "status": "In Progress",
+            "created": "2026-07-05",
+            "due_date": "",
+            "completed": false,
+            "why": "Create a configurable personality structure for the assistant.",
+            "notes": [
+                "Defined assistant identity and communication style."
+            ]
+        },
+        {
+            "title": "Create Character Database Prototype",
+            "project": "Creative Writing Tool",
+            "priority": "Medium",
+            "status": "Not Started",
+            "created": "2026-07-10",
+            "due_date": "",
+            "completed": false,
+            "why": "Test organization features for creative projects.",
+            "notes": []
+        },
+        {
+            "title": "Test Quest Completion System",
+            "project": "AURORA",
+            "priority": "Medium",
+            "status": "Completed",
+            "created": "2026-07-12",
+            "due_date": "",
+            "completed": true,
+            "why": "Verify that users can complete and track tasks.",
+            "notes": [
+                "Completion tracking verified."
+            ]
+        }
+    ]
+}
