@@ -4,7 +4,12 @@ import os
 
 from Design.aurora_theme import (
     apply_theme,
-    title_style
+    title_style,
+    header_style,
+    body_style,
+    button_style,
+    card_style,
+    AURORA_DARK
 )
 
 from Interface.task_chamber import show_task_list
@@ -45,11 +50,25 @@ def open_project_room():
 
     title = ctk.CTkLabel(
         room,
-        text="📚 PROJECT ARCHIVE",
+        text="📚 Project Archive",
         **title_style()
     )
 
     title.pack(pady=20)
+
+    scroll_frame = ctk.CTkScrollableFrame(
+        room,
+        width=550,
+        height=380,
+        fg_color=AURORA_DARK
+    )
+
+    scroll_frame.pack(
+        fill="both",
+        expand=True,
+        padx=20,
+        pady=(0, 20)
+    )
 
 
     data = load_projects()
@@ -59,7 +78,10 @@ def open_project_room():
 
     for project in projects:
 
-        card = ctk.CTkFrame(room)
+        card = ctk.CTkFrame(
+            scroll_frame,
+            **card_style()
+        )
 
         card.pack(
             fill="x",
@@ -81,7 +103,7 @@ def open_project_room():
                 f"Notes: {project['notes']}\n"
                 f"Next Steps: {project['next_steps']}"
             ),
-            font=("Arial", 16),
+            **body_style(),
             justify="left",
             anchor="w"
         )
@@ -94,8 +116,9 @@ def open_project_room():
 
         task_button = ctk.CTkButton(
             card,
-            text="📋 View Tasks",
-            command=lambda p=project: open_project_tasks(p)
+            text="View Tasks",
+            command=lambda p=project: open_project_tasks(p),
+            **button_style()
         )
 
         task_button.pack(

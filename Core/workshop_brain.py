@@ -126,6 +126,30 @@ class WorkshopBrain:
             []
         )
 
+    def get_completed_tasks(self):
+
+        completed_tasks = []
+
+        for task in self.get_tasks():
+
+            if task.get("completed", False):
+
+                completed_tasks.append(task)
+
+        return completed_tasks
+
+    def get_completed_tasks(self):
+
+        completed_tasks = []
+
+        for task in self.get_tasks():
+
+            if task.get("completed", False):
+
+                completed_tasks.append(task)
+
+        return completed_tasks
+
     def save_tasks(self):
 
         task_file = os.path.join(
@@ -165,6 +189,7 @@ class WorkshopBrain:
             ):
 
                 saved_task["completed"] = True
+                saved_task["status"] = "Completed"
 
                 break
 
@@ -196,11 +221,6 @@ class WorkshopBrain:
                     "Not Started"
                 )
 
-                updated_task["due_date"] = saved_task.get(
-                    "due_date",
-                    ""
-                )
-
                 self.tasks["tasks"][index] = updated_task
 
                 self.save_tasks()
@@ -230,20 +250,14 @@ class WorkshopBrain:
             return None
         
         priority_order = {
-
-            "high": 1, 
             "High": 1,
-
-            "medium": 2,
             "Medium": 2,
-
-            "low": 3,
-            "Low":3
+            "Low": 3
         }
 
         unfinished.sort(
             key=lambda task: priority_order.get(
-                task.get("priority", "low"),
+                task.get("priority", "Low"),
                 3
             )
         )
@@ -765,6 +779,10 @@ class WorkshopBrain:
 
         self.save_tasks()
 
+# =========================================
+# TEST THE WORKSHOP BRAIN
+# =========================================
+
 if __name__ == "__main__":
 
     brain = WorkshopBrain()
@@ -838,7 +856,7 @@ if __name__ == "__main__":
 
     print(
         brain.format_response(
-        "the Workshop is ready for today's creation."
+            "the Workshop is ready for today's creation."
         )
     )
 
@@ -851,7 +869,7 @@ if __name__ == "__main__":
     for line in brain.get_workshop_summary():
 
         print(line)
-    
+
     print()
 
     print("🌿 Aurora Welcome")
@@ -859,10 +877,8 @@ if __name__ == "__main__":
     print()
 
     print(
-    brain.get_welcome_back()
+        brain.get_welcome_back()
     )
-
-    print()
 
     print()
 
@@ -882,14 +898,22 @@ if __name__ == "__main__":
             f"{symbol} {system}"
         )
 
-        print()
+    print()
 
-        print("📋 Task Test")
+    print("📋 Task Test")
 
-        print()
+    print()
 
-        for task in brain.get_tasks():
+    for task in brain.get_tasks():
 
-            print(task["title"])
+        print(task["title"])
 
-    
+    print()
+
+    print("📜 Completed Tasks")
+
+    print()
+
+    for task in brain.get_completed_tasks():
+
+        print(task["title"])

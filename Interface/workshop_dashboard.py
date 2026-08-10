@@ -1,9 +1,21 @@
-import tkinter as tk
+import customtkinter as ctk
 
 from Core.workshop_brain import WorkshopBrain
 from Interface.memory_room import open_memory_room 
 from Interface.project_room import open_project_room
 from Interface.task_chamber import open_task_chamber
+
+from Design.aurora_theme import (
+    apply_theme,
+    title_style,
+    header_style,
+    body_style,
+    button_style,
+    card_style,
+    AURORA_DARK,
+    AURORA_PANEL,
+    AURORA_GLOW
+)
 
 class WorkshopDashboard:
 
@@ -11,14 +23,14 @@ class WorkshopDashboard:
 
         self.brain = WorkshopBrain()
 
-        self.window = tk.Tk()
+        self.window = ctk.CTk()
 
         self.window.title(
-            "🌿 AURORA Workshop"
+            "AURORA Workshop"
         )
 
         self.window.geometry(
-            "700x500"
+            "700x650"
         )
 
 
@@ -33,37 +45,33 @@ class WorkshopDashboard:
 
     def build(self):
 
+        apply_theme()
+
         self.window.configure(
-            bg="#101820"
+            fg_color=AURORA_DARK
         )
 
-        title = tk.Label(
+        title = ctk.CTkLabel(
             self.window,
-            text="🌿 AURORA",
-            font=(
-                "Helvetica",
-                24
-            )
+            text="AURORA",
+            **title_style()
         )
 
         title.pack(
             pady=20
         )
 
-
-        subtitle = tk.Label(
+        subtitle = ctk.CTkLabel(
             self.window,
             text="The Workshop is awake.",
-            font=(
-                "Helvetica",
-                14
-            )
+            **body_style()
         )
 
         subtitle.pack()
 
-        menu = tk.Frame(
-            self.window
+        menu = ctk.CTkFrame(
+            self.window,
+            fg_color="transparent"
         )
 
         menu.pack(
@@ -72,34 +80,38 @@ class WorkshopDashboard:
 
 
         buttons = [
-            ("📚 Projects", open_project_room),
-            ("📋 Tasks", open_task_chamber),
-            ("📖 Journal", None),
-            ("🌱 Memory Garden", open_memory_room),
-            ("🌙 Reflection", None),
-            ("⚙ Health", None)
+            ("Projects", open_project_room),
+            ("Tasks", open_task_chamber),
+            ("Journal", None),
+            ("Memory Garden", open_memory_room),
+            ("Reflection", None),
+            ("Health", None)
         ]
 
 
         for text, command in buttons:
 
-            tk.Button(
+            ctk.CTkButton(
                 menu,
                 text=text,
-                width=20,
-                command=command
+                width=220,
+                command=command,
+                **button_style()
             ).pack(
-                pady=3
+                pady=5
             )
 
 
         summary = self.load_workshop()
 
 
-        summary_box = tk.Text(
+        summary_box = ctk.CTkTextbox(
             self.window,
-            height=15,
-            width=70
+            height=180,
+            width=620,
+            fg_color=AURORA_PANEL,
+            text_color="white",
+            border_width=0
         )
 
         summary_box.pack(
@@ -110,12 +122,12 @@ class WorkshopDashboard:
         for line in summary:
 
             summary_box.insert(
-                tk.END,
+                ctk.END,
                 line + "\n"
             )
 
 
-        summary_box.config(
+        summary_box.configure(
             state="disabled"
         )
 
