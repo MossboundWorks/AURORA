@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MOMENT_FILE = os.path.join(
     BASE_DIR,
     "Memory",
-    "moments.json"
+    "milestones.json"
 )
 
 
@@ -19,7 +19,7 @@ def load_moments():
         with open(MOMENT_FILE, "r") as file:
             return json.load(file)
 
-    return {"moments": []}
+    return {"milestones": []}
 
 
 def save_moments(data):
@@ -43,7 +43,7 @@ def add_moment():
         "description": description
     }
 
-    data["moments"].append(moment)
+    data["milestones"].append(moment)
 
     save_moments(data)
 
@@ -54,7 +54,7 @@ def view_memories():
 
     data = load_moments()
 
-    moments = data["moments"]
+    moments = data["milestones"]
 
     print()
 

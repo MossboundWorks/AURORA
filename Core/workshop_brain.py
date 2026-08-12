@@ -6,19 +6,23 @@ BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))
 )
 
-SESSION_FILE = os.path.join(
-    BASE_DIR,
-    "Memory",
-    "workshop_sessions.json"
-)
-
 PERSONALITY_FILE = os.path.join(
     BASE_DIR,
     "Config",
     "personality.json"
 )
 
+USER_FILE = os.path.join(
+    BASE_DIR,
+    "Config",
+    "user.json"
+)
+
 from datetime import datetime
+
+from Core.session_manager import SessionManager
+
+from Core.session_controller import SessionController
 
 class WorkshopBrain:
 
@@ -28,9 +32,13 @@ class WorkshopBrain:
         self.projects = {}
         self.tasks = {}
         self.journal = {}
-        self.sessions = {}
         self.personality = {}
+        self.user = {}
 
+        self.session_controller = SessionController()
+        self.session_manager = self.session_controller.manager
+
+        self.awaken()
 
     def load_json(self, path):
 
@@ -49,7 +57,7 @@ class WorkshopBrain:
             os.path.join(
                 BASE_DIR,
                 "Memory",
-                "moments.json"
+                "milestones.json"
             )
         )
 
@@ -77,12 +85,12 @@ class WorkshopBrain:
             )
         )
 
-        self.sessions = self.load_json(
-            SESSION_FILE
-        )
-
         self.personality = self.load_json(
             PERSONALITY_FILE
+        )
+
+        self.user = self.load_json(
+            USER_FILE
         )
     
     def get_projects(self):
@@ -383,44 +391,9 @@ class WorkshopBrain:
         
         return entry
 
-    def record_session(self, project, note):
-
-        if "sessions" not in self.sessions:
-
-            self.sessions["sessions"] = []
-
-
-        session = {
-
-            "date": datetime.now().strftime(
-                "%Y-%m-%d %H:%M"
-            ),
-
-            "project": project,
-
-            "note": note
-        }
-
-        self.sessions["sessions"].append(
-            session
-        )
-
-        with open(SESSION_FILE, "w") as file:
-
-            json.dump(
-                self.sessions,
-                file,
-                indent=4
-            )
-
-        return session
-    
     def get_project_history(self, project_name):
 
-        sessions = self.sessions.get(
-            "sessions",
-            []
-        )
+        sessions = self.session_manager.get_sessions()
 
         history = []
 
@@ -430,28 +403,219 @@ class WorkshopBrain:
 
                 history.append(session)
 
-
-        return history
+            return history
 
     def get_last_session(self):
 
-        sessions = self.sessions.get(
-            "sessions",
+        return self.session_manager.get_last_session()
+
+    def get_current_work(self):
+
+        return self.session_controller.get_work_context()
+
+    def start_work(
+            self, 
+            project, 
+            task=None
+    ):
+
+        return self.session_controller.begin_work(
+            project,
+            task
+        )
+
+    def finish_work(
+        self,
+        accomplishments=None,
+        next_step=""
+    ):
+
+        session = self.session_controller.finish_work(
+            accomplishments,
+            next_step
+        )
+
+        if not session:
+
+            return None
+
+        self.record_session()
+
+        return session
+
+    def get_work_status(self):
+
+        session = self.session_controller.get_work_context()
+
+        if not session:
+            return None
+
+        return session
+
+    def get_work_status(self):
+
+        work = self.get_current_work()
+
+        if not work:
+
+            return (
+                "No active work session."
+            )
+
+        project = work.get(
+            "project",
+            "Unknown Project"
+        )
+
+        task = work.get(
+            "task"
+        )
+
+        started = work.get(
+            "started",
+            "Unknown"
+        )
+
+        status = work.get(
+            "status",
+            "Unknown"
+        )
+
+        report = []
+
+        report.append(
+            "Current Work"
+        )
+
+        report.append("")
+
+        report.append(
+            f"Project: {project}"
+        )
+
+        if task:
+
+            report.append(
+                f"Task: {task}"
+            )
+
+        report.append(
+            f"Started: {started}"
+        )
+
+        report.append(
+            f"Status: {status}"
+        )
+
+        return "\n".join(report)
+
+    def record_session(self):
+
+        session = self.session_manager.get_last_session()
+
+        if not session:
+
+            return None
+
+        session_id = session.get(
+            "id"
+        )
+
+        journal = self.journal
+
+        if "entries" not in journal:
+
+            journal["entries"] = []
+
+        for entry in journal["entries"]:
+
+            if entry.get("session_id") == session_id:
+
+                return entry
+
+        accomplishments = session.get(
+            "accomplishments",
             []
         )
 
-        if not sessions:
+        if accomplishments:
 
-            return None
-        
-        return sessions [-1]
-    
+            accomplishment = ", ".join(
+                str(item)
+                for item in accomplishments
+            )
+
+        else:
+
+            accomplishment = ""
+
+        entry = {
+
+            "date": datetime.now().strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+
+            "session_id": session_id,
+
+            "project": session.get(
+                "project",
+                "Unknown"
+            ),
+
+            "focus": session.get(
+                "task",
+                "Unknown"
+            ),
+
+            "accomplishment": accomplishment,
+
+            "next_step": session.get(
+                "next_step",
+                ""
+            )
+        }
+
+        journal["entries"].append(
+            entry
+        )
+
+        journal_file = os.path.join(
+            BASE_DIR,
+            "Memory",
+            "workshop_journal.json"
+        )
+
+        with open(
+            journal_file,
+            "w"
+        ) as file:
+
+            json.dump(
+                journal,
+                file,
+                indent=4
+         )
+
+        self.journal = journal
+
+        return entry
+
     def get_identity(self):
 
         return self.personality.get(
             "identity",
             {}
     )
+
+    def get_user(self):
+
+        return self.user.get(
+            "preferred_name",
+            self.user.get(
+                "name",
+                "User"
+            )
+        )
     
     def get_creator(self):
 
@@ -469,10 +633,7 @@ class WorkshopBrain:
     
     def get_project_activity(self):
 
-        sessions = self.sessions.get(
-            "sessions",
-            []
-        )
+        sessions = self.session_manager.get_sessions()
 
         activity = {}
 
@@ -497,7 +658,7 @@ class WorkshopBrain:
         if not activity:
 
             observations.append(
-                "🌱 No workshop activity recorded yet."
+                "No workshop activity recorded yet."
             )
 
             return observations
@@ -511,11 +672,11 @@ class WorkshopBrain:
         sessions = activity[most_active]
 
         observations.append(
-            f"🌿 Your most active project is {most_active}."
+            f"Your most active project is {most_active}."
         )
 
         observations.append(
-            f"✨ The Workshop has recorded {sessions} session(s) for this project."
+            f"The Workshop has recorded {sessions} session(s) for this project."
         )
 
         return observations
@@ -530,7 +691,7 @@ class WorkshopBrain:
         if not activity:
 
             recommendations.append(
-                "🌱 Start a project session so I can learn your patterns."
+                "Start a project session so I can learn your patterns."
             )
 
             return recommendations
@@ -543,26 +704,26 @@ class WorkshopBrain:
         count = activity[most_active]
 
         recommendations.append(
-            f"✨ You have been focusing most on {most_active}."
+            f"You have been focusing most on {most_active}."
         )
 
         if most_active == "Aurora":
 
             recommendations.append(
-            "🌿 Your assistant systems are actively growing. Continue strengthening her foundation."
+            "Your assistant systems are actively growing. Continue strengthening her foundation."
         )
             
         elif most_active == "Faerie Veil":
 
             recommendations.append(
-                "🦋 Your creative world is calling. Consider developing the next piece of the story."
+                "Your creative world is calling. Consider developing the next piece of the story."
             )
 
 
         else:
 
             recommendations.append(
-                f"📚 Consider continuing progress on {most_active} while your momentum is strong."
+                f"Consider continuing progress on {most_active} while your momentum is strong."
             )
 
 
@@ -575,7 +736,7 @@ class WorkshopBrain:
         if not activity:
 
             return (
-                "🌱 I need more Workshop history "
+                "I need more Workshop history "
                 "before I can recognize patterns."
             )
 
@@ -590,7 +751,7 @@ class WorkshopBrain:
 
 
         return (
-            f"🌿 I noticed that {most_active} "
+            f"I noticed that {most_active} "
             f"has been your most active project "
             f"with {sessions} recorded session(s). "
             "This suggests it is currently your strongest focus."
@@ -608,7 +769,7 @@ class WorkshopBrain:
         if "British" in voice_style:
 
             return (
-                f"🌿 Moss, {message}"
+                f"{self.get_user()}, {message}"
             )
         
         return message
@@ -621,7 +782,7 @@ class WorkshopBrain:
         identity = self.get_identity()
 
         summary.append(
-            f"✨ Aurora Identity: {identity.get('role', 'Unknown')}"
+            f"Aurora Identity: {identity.get('role', 'Unknown')}"
         )
 
 
@@ -631,13 +792,13 @@ class WorkshopBrain:
         if self.projects:
 
             summary.append(
-            "📚 Active Projects:"
+            "Active Projects:"
             )
 
             for project in self.projects.get("projects", [])[:3]:
 
                 summary.append(
-                    f"   ✨ {project['name']}"
+                    f"   {project['name']}"
                 )
 
 
@@ -653,13 +814,13 @@ class WorkshopBrain:
         if tasks:
 
             summary.append(
-                "📋 Current Tasks:"
+                "Current Tasks:"
             )
 
         for task in tasks[:3]:
 
             summary.append(
-                f"   🌱 {task['title']}"
+                f"   {task['title']}"
             )
 
 
@@ -669,7 +830,7 @@ class WorkshopBrain:
         observations = self.make_observation()
 
         summary.append(
-            "🌿 Workshop Observation:"
+            "Workshop Observation:"
         )
 
 
@@ -686,7 +847,7 @@ class WorkshopBrain:
         recommendations = self.give_recommendation()
 
         summary.append(
-            "💡 Recommendation:"
+            "Recommendation:"
         )
 
 
@@ -706,19 +867,82 @@ class WorkshopBrain:
         if not session:
 
             return (
-                "🌿 Welcome back, Moss. "
+                "Welcome back, {self.get_user()}. "
                 "The Workshop is ready for a new beginning."
             )
 
 
-        return (
-            f"🌿 Welcome back, Moss.\n\n"
-            f"📖 Last Workshop Memory:\n"
-            f"You were working on {session['project']}.\n\n"
-            f"✨ You:\n"
-            f"{session['note']}\n\n"
-            f"🌱 The Workshop is ready to continue growing."
+        project = session.get(
+            "project",
+            "Unknown Project"
         )
+
+        task = session.get(
+            "task"
+        )
+
+        accomplishments = session.get(
+            "accomplishments",
+            []
+        )
+
+        next_step = session.get(
+            "next_step",
+            ""
+        )
+
+        status = session.get(
+            "status",
+            "Unknown"
+        )
+
+
+        message = (
+            f"Welcome back, {self.get_user()}.\n\n"
+            f"Last Workshop Session:\n"
+            f"Project: {project}\n"
+        )
+
+
+        if task:
+
+            message += (
+                f"Task: {task}\n"
+            )
+
+
+        if status:
+
+            message += (
+                f"Status: {status}\n"
+            )
+
+
+        if accomplishments:
+
+            message += "\nAccomplished:\n"
+
+            for accomplishment in accomplishments:
+
+                message += (
+                    f"• {accomplishment}\n"
+            )   
+
+
+        if next_step:
+
+            message += (
+                f"\nNext Step:\n"
+                f"{next_step}\n"
+            )
+
+
+        message += (
+            "\nThe Workshop is ready to continue growing."
+        )
+
+
+        return message
     
     def health_check(self):
 
@@ -726,7 +950,7 @@ class WorkshopBrain:
             
             "Memory": bool(
                 self.memory.get(
-                    "moments",
+                    "milestones",
                     []
                 )
             ),
@@ -746,10 +970,7 @@ class WorkshopBrain:
             ),
 
             "Sessions": bool(
-                self.sessions.get(
-                    "sessions",
-                    []
-                )
+                self.session_manager.get_sessions()
             ),
 
             "Personality": bool(
@@ -778,6 +999,75 @@ class WorkshopBrain:
         ]
 
         self.save_tasks()
+
+    def get_available_work(self):
+
+        tasks = self.tasks.get(
+            "tasks",
+            []
+        )
+
+        available = []
+
+        for task in tasks:
+
+            if task.get("completed") is True:
+                continue
+
+            if task.get("status") == "Completed":
+                continue
+
+            available.append(task)
+
+        return available
+
+    def select_work(self):
+
+        tasks = self.get_available_work()
+
+        if not tasks:
+
+            return None
+
+        print()
+        print("Available work:")
+        print()
+
+        for index, task in enumerate(tasks, start=1):
+
+            project = task.get(
+                "project",
+                "Unknown Project"
+            )
+
+            priority = task.get(
+                "priority",
+                "Unknown"
+            )
+
+            print(
+                f"{index}. "
+                f"{task.get('title', 'Untitled')} "
+                f"[{project} | {priority}]"
+            )
+
+        print()
+
+        choice = input(
+            "Select a task: "
+        ).strip()
+
+        if not choice.isdigit():
+
+            return None
+
+        index = int(choice) - 1
+
+        if index < 0 or index >= len(tasks):
+
+            return None
+
+        return tasks[index]
 
 # =========================================
 # TEST THE WORKSHOP BRAIN
@@ -900,7 +1190,7 @@ if __name__ == "__main__":
 
     print()
 
-    print("📋 Task Test")
+    print("Task Test")
 
     print()
 
@@ -910,10 +1200,18 @@ if __name__ == "__main__":
 
     print()
 
-    print("📜 Completed Tasks")
+    print("Completed Tasks")
 
     print()
 
     for task in brain.get_completed_tasks():
 
         print(task["title"])
+
+    print()
+
+    print("👤 User Test:")
+
+    print(
+        brain.get_user()
+    )

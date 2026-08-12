@@ -12,16 +12,21 @@ sys.path.append(ARCHIVE_DIR)
 sys.path.append(TASK_DIR)
 
 
-from project_manager import view_projects, add_project, show_project
-from task_manager import (
+from Archive.project_manager import view_projects, add_project, show_project
+from Tasks.task_manager import (
     add_task,
     view_tasks,
     count_tasks,
     get_guiding_task
 )
-from memory_keeper import add_moment, view_memories
-from workshop_status import workshop_status
-from welcome_system import welcome
+
+from Core.workshop_brain import WorkshopBrain
+from Core.memory_keeper import add_moment, view_memories
+from Core.workshop_status import workshop_status
+from Core.welcome_system import welcome
+from Commands.commands import COMMANDS
+
+brain = WorkshopBrain()
 
 CONFIG_FILE = os.path.join(
     BASE_DIR,
@@ -73,63 +78,53 @@ task_count = count_tasks()
 print()
 
 if task_count == 0:
-    print("🌱 The Workshop is peaceful today.")
+    print("The Workshop is peaceful today.")
 elif task_count == 1:
-    print("🌿 There is 1 task waiting in the Workshop.")
+    print("There is 1 task waiting in the Workshop.")
 else:
-    print(f"🌿 There are {task_count} tasks waiting in the Workshop.")
+    print(f"There are {task_count} tasks waiting in the Workshop.")
 
 guiding_task = get_guiding_task()
 
 if guiding_task:
     print()
-    print("✨ Your Guiding Lantern:")
-    print(f"📌 {guiding_task['title']}")
-    print(f"🌙 Project: {guiding_task['project']}")
-    print(f"⭐ Priority: {guiding_task['priority']}")
+    print("Your Guiding Lantern:")
+    print(f"{guiding_task['title']}")
+    print(f"Project: {guiding_task['project']}")
+    print(f"Priority: {guiding_task['priority']}")
 
 
 print()
 
-command = input("Awaiting your command, Moss:")
+while True:
 
-print()
+    command = input(
+        f"Aurora > "
+    ).lower().strip()
 
-if command.lower() == "hello":
-    print("Greetings, Moss. The Workshop is ready.")
+    if command == "quit":
 
-elif command.lower() == "status":
-    print("Aurora Core: Online")
-    print("Archive System: Awaiting development")
+        print()
 
-elif command.lower() == "view projects":
-    view_projects()
+        print(
+            f"Goodbye, {brain.get_user()}."
+        )
 
-elif command.lower() == "exit":
-    print("Until next time, Moss. The Workshop will remain prepared.")
+        break
 
-elif command.lower() == "add project":
-    add_project()
+    action = COMMANDS.get(command)
 
-elif command.lower() == "show project":
-    show_project()
+    if action:
 
-elif command.lower() == "add task":
-    add_task()
+        action()
 
-elif command.lower() == "show tasks":
-    view_tasks()
-    
-elif command.lower() == "plant memory":
-    add_moment()
+    else:
 
-elif command.lower() == "show memories":
-    view_memories()
+        print()
 
-elif command.lower() == "status":
-    workshop_status()
+        print(
+            f"I have not learned that command yet, "
+            f"{brain.get_user()}."
+        )
 
-else:
-    print("I have not learned that command yet, Moss.")
-
-print("Archive connection successful")
+        print()

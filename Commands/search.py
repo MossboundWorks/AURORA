@@ -146,7 +146,7 @@ def search_command():
     # ----------------------------
 
     moments = brain.memory.get(
-        "moments",
+        "milestones",
         []
     )
 

@@ -21,9 +21,10 @@ env/
 # Personal AURORA data
 Memory/projects.json
 Memory/tasks.json
-Memory/moments.json
+Memory/milestones.json
 Memory/workshop_journal.json
 Memory/workshop_sessions.json
+Config/user.json
 
 # Personal backups
 *backup*

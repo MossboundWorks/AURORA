@@ -25,7 +25,7 @@ TASK_FILE = os.path.join(
 MOMENT_FILE = os.path.join(
     BASE_DIR,
     "Memory",
-    "moments.json"
+    "milestones.json"
 )
 
 def load_file(path):
@@ -57,16 +57,16 @@ def search_memories(project_name):
 
     data = load_file(MOMENT_FILE)
 
-    moments = data.get("moments", [])
+    milestones = data.get("milestones", [])
 
     results = []
 
-    for moment in moments:
+    for milestone in milestones:
 
-        description = moment.get("description", "").lower()
+        description = milestone.get("description", "").lower()
 
         if project_name.lower() in description:
-            results.append(moment)
+            results.append(milestone)
 
     return results
 

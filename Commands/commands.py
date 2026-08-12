@@ -35,6 +35,11 @@ from Commands.search import (
     search_command,
 )
 
+from Commands.work import (
+    work_command,
+    end_work_command
+)
+
 COMMANDS = {
     "help": help_command,
     "identity": identity_command,
@@ -51,5 +56,7 @@ COMMANDS = {
     "complete task": complete_task_command,
     "remember moment": remember_moment_command,
     "garden": garden_command,
-    "search": search_command
+    "search": search_command,
+    "work": work_command,
+    "end work": end_work_command
 }

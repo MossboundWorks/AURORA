@@ -3,8 +3,8 @@ import json
 import os
 import random
 
-from aurora_focus import get_today_focus
-from workshop_brain import WorkshopBrain
+from Core.aurora_focus import get_today_focus
+from Core.workshop_brain import WorkshopBrain
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(
@@ -13,13 +13,14 @@ BASE_DIR = os.path.dirname(
 
 MEMORY_FILE = os.path.join(
     BASE_DIR,
-    "Memory","moments.json"
+    "Memory",
+    "milestones.json"
 )
 
 PROJECT_FILE = os.path.join(
     BASE_DIR,
     "Memory",
-    "memories.json"
+    "projects.json"
 )
 
 TASK_FILE = os.path.join(
@@ -65,7 +66,7 @@ def system_report():
         )
 
     memory_count = len(
-        memories.get("moments", [])
+        memories.get("milestones", [])
     )
 
     project_count = len(
@@ -94,12 +95,12 @@ def display_system_report():
     report = system_report()
 
     print(
-        f"🌱 Memory Garden: "
+        f"Memory Garden: "
         f"{report['memory_count']} memories preserved."
     )
 
     print(
-        f"📚 Project Archive: "
+        f"Project Archive: "
         f"{report['project_count']} projects found."
     )
 
@@ -109,7 +110,7 @@ def display_system_report():
     )
 
     print(
-        f"📋 Task Board: "
+        f"Task Board: "
         f"{report['task_count']} tasks tracked."
     )
 
@@ -126,7 +127,7 @@ def focus_report():
 
 
     report.append(
-        "🌿 Workshop Overview:"
+        "Workshop Overview:"
     )
 
 
@@ -136,14 +137,14 @@ def focus_report():
 
 
     report.append(
-        "📚 Active Projects:"
+        "Active Projects:"
     )
 
 
     for project in projects[:3]:
 
         report.append(
-            f"   ✨ {project['name']}"
+            f"   {project['name']}"
         )
 
 
@@ -153,7 +154,7 @@ def focus_report():
 
 
     report.append(
-        "📋 Pending Tasks:"
+        "Pending Tasks:"
     )
 
 
@@ -167,14 +168,28 @@ def focus_report():
 
     return report
 
+def work_status_report():
+
+    brain = WorkshopBrain()
+
+    work = brain.get_work_status()
+
+    if not work:
+
+        return [
+            "There is no active work session."
+        ]
+
+    return work.splitlines()
+
 def run_boot_sequence():
 
     messages = [
-        "🌿 Initializing Aurora Workshop...",
-        "⚙ Connecting Design Engine...",
-        "📚 Dusting Project Archive...",
-        "🌱 Watering Memory Garden...",
-        "📋 Loading Task Board...",
+        "Initializing Aurora Workshop...",
+        "Connecting Design Engine...",
+        "Dusting Project Archive...",
+        "Watering Memory Garden...",
+        "Loading Task Board...",
         "",
         get_greeting()
     ]
@@ -185,25 +200,37 @@ def run_boot_sequence():
 
         time.sleep(0.7)
 
+    print()
+
+    for message in work_status_report():
+
+        print(message)
+
+        time.sleep(0.7)
 
 def workshop_ready():
     return True
 
 def get_greeting():
 
+    brain = WorkshopBrain()
+    brain.awaken()
+
+    user = brain.get_user()
+
     greetings = [
 
-        "🌿 Welcome back, Moss. The Workshop has been waiting.",
+        f"Welcome back, {user}. The Workshop has been waiting.",
 
-        "✨ Good to see you again. Everything is just as you left it.",
+        f"Good to see you again, {user}. Everything is just as you left it.",
 
-        "📚 Your projects are safe. Shall we continue building?",
+        f"Your projects are safe, {user}. Shall we continue building?",
 
-        "🌱 The Memory Garden has been quiet while you were away.",
+        f"The Memory Garden has been quiet while you were away, {user}.",
 
-        "⚙ Systems ready. Magic stable. Workshop prepared.",
+        f"Systems ready, {user}. Magic stable. Workshop prepared.",
 
-        "🦋 Welcome home, Moss. Your next creation is waiting."
+        f"Welcome home, {user}. Your next creation is waiting."
     ]
 
     return random.choice(greetings)
@@ -243,19 +270,19 @@ def workshop_progress():
     if memories > previous["memory_count"]:
 
         messages.append(
-            "🌱 The Memory Garden has grown."
+            "The Memory Garden has grown."
         )
 
     if projects > previous["project_count"]:
 
         messages.append(
-            "📚 The Project Archive welcomed something new."
+            "The Project Archive welcomed something new."
         )
 
     if tasks > previous["task_count"]:
 
         messages.append(
-            "📋 New work has appeared on the Task Board."
+            "New work has appeared on the Task Board."
         )
 
     save_workshop_state({
@@ -279,7 +306,7 @@ def daily_briefing():
     report = []
 
     report.append(
-        "🌿 Today's Focus:"
+        "Today's Focus:"
     )
 
     report.append(
@@ -289,21 +316,21 @@ def daily_briefing():
     if action["task"]:
 
         report.append(
-            f"✨ {action['task']['title']}"
+            f"{action['task']['title']}"
         )
 
         report.append(
-            f"📚 Project: {action['task']['project']}"
+            f"Project: {action['task']['project']}"
         )
 
         report.append(
-            f"💡 {action['reason']}"
+            f"{action['reason']}"
         )
 
     else:
 
         report.append(
-            "✨ No active tasks found."
+            "No active tasks found."
         )
 
 
@@ -311,7 +338,7 @@ def daily_briefing():
 
 def write_journal_entry():
 
-    print("📖 Writing workshop journal...")    
+    print("Writing workshop journal...")    
 
     journal = load_data(JOURNAL_FILE)
 
@@ -361,7 +388,7 @@ if __name__ == "__main__":
 
         print()
 
-        print("🌿 Since your last visit:")
+        print("Since your last visit:")
 
         print()
 

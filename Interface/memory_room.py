@@ -15,7 +15,7 @@ from Design.aurora_theme import (
 MEMORY_FILE = os.path.join(
     BASE_DIR,
     "Memory",
-    "moments.json"
+    "milestones.json"
 )
 
 
@@ -53,16 +53,16 @@ def open_memory_room():
 
     data = load_memories()
 
-    memories = data.get("moments", [])
+    memories = data.get("milestones", [])
 
 
-    for memory in memories:
+    for milestone in milestones:
 
         card = ctk.CTkLabel(
             room,
             text=(
-                f"✨ {memory['category']}\n"
-                f"{memory['description']}"
+                f"✨ {milestones['category']}\n"
+                f"{milestones['description']}"
             ),
             font=("Arial", 16),
             wraplength=550

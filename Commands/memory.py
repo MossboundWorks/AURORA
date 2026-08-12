@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(
 MOMENTS_FILE = os.path.join(
     BASE_DIR,
     "Memory",
-    "moments.json"
+    "milestones.json"
 )
 
 def remember_moment_command():
@@ -35,9 +35,9 @@ def remember_moment_command():
 
     moments = brain.memory
 
-    if "moments" not in moments:
+    if "milestones" not in moments:
 
-        moments["moments"] = []
+        moments["milestones"] = []
 
 
     moment = {
@@ -53,7 +53,7 @@ def remember_moment_command():
     }
 
 
-    moments["moments"].append(
+    moments["milestones"].append(
         moment
     )
 
@@ -94,7 +94,7 @@ def garden_command():
     brain.awaken()
 
     moments = brain.memory.get(
-        "moments",
+        "milestones",
         []
     )
 

@@ -16,7 +16,7 @@ The Task Chamber allows User to:
 
 Future Features
 ---------------
-• Search & Filters
+• Search Filters
 =========================================
 """
 

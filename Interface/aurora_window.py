@@ -18,7 +18,7 @@ MEMORY_FILE = os.path.join(
 MOMENTS_FILE = os.path.join(
     BASE_DIR,
     "Memory",
-    "moments.json"
+    "milestones.json"
 )
 
 TASK_FILE = os.path.join(
@@ -50,7 +50,7 @@ def get_dashboard():
 
     memory = load_data(MEMORY_FILE)
 
-    moments = load_data(MOMENTS_FILE)
+    milestones_data = load_data(MOMENTS_FILE)
 
     tasks = load_data(TASK_FILE)
 
@@ -58,7 +58,7 @@ def get_dashboard():
 
     task_list = tasks.get("tasks", [])
 
-    memory_moments = moments.get("moments", [])
+    milestones = milestones_data.get("milestones", [])
 
 
     return f"""
@@ -66,7 +66,7 @@ def get_dashboard():
 
 📋 Tasks Waiting: {len(task_list)}
 
-🌱 Memories Preserved: {len(memory_moments)}
+🌱 Memories Preserved: {len(milestones)}
 
 ━━━━━━━━━━━━━━
 

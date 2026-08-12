@@ -16,7 +16,9 @@ while True:
 
     if command == "quit":
         print()
-        print("Goodbye, Moss.")
+        print(
+            f"Goodbye, {brain.get_user()}."
+        )
         break
 
     action = COMMANDS.get(command)

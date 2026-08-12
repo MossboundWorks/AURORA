@@ -115,30 +115,44 @@ def record_command():
 
     print()
 
-    project = input(
-        "Project name: "
-    ).strip()
+    entry = brain.record_session()
 
-    note = input(
-        "What did you accomplish? "
-    ).strip()
+    if not entry:
 
-    session = brain.record_session(
-        project,
-        note
-    )
+        print(
+            "No completed work session found."
+        )
 
-    print()
+        print()
 
-    print("🌿 Session Recorded")
-    print("----------------------------")
+        return
 
     print(
-        f"Project: {session['project']}"
+        "Workshop Record"
     )
 
     print(
-        f"Note: {session['note']}"
+        "----------------------------"
+    )
+
+    print(
+        f"Project: "
+        f"{entry['project']}"
+    )
+
+    print(
+        f"Focus: "
+        f"{entry['focus']}"
+    )
+
+    print(
+        f"Accomplishment: "
+        f"{entry['accomplishment']}"
+    )
+
+    print(
+        f"Next Step: "
+        f"{entry['next_step']}"
     )
 
     print()

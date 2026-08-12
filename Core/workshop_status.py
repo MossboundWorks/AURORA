@@ -38,7 +38,7 @@ def workshop_status():
 
     task_list = tasks.get("tasks", [])
 
-    moments = memory.get("moments", [])
+    milestone = memory.get("milestones", [])
 
 
     print()
@@ -53,5 +53,5 @@ def workshop_status():
 
     print(f"📋 Tasks: {len(task_list)}")
 
-    print(f"🌿 Memories: {len(moments)}")
+    print(f"🌿 Memories: {len(milestone)}")
 
