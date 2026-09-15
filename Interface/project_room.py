@@ -1,6 +1,6 @@
 import customtkinter as ctk
-import json
-import os
+
+from Core.workshop_brain import WorkshopBrain
 
 from Design.aurora_theme import (
     apply_theme,
@@ -14,52 +14,31 @@ from Design.aurora_theme import (
 
 from Interface.task_chamber import show_task_list
 
-
-BASE_DIR = os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))
-)
-
-PROJECT_FILE = os.path.join(
-    BASE_DIR,
-    "Memory",
-    "projects.json"
-)
-
-def load_projects():
-
-    if os.path.exists(PROJECT_FILE):
-
-        with open(PROJECT_FILE, "r") as file:
-            return json.load(file)
-        
-    return{}
-
-
-def open_project_room():
+def open_project_room(window, brain):
 
     apply_theme()
 
-    room = ctk.CTkToplevel(
-        fg_color="#1B241B"
+    for widget in window.winfo_children():
+        widget.destroy()
+
+    window.configure(
+        fg_color=AURORA_DARK
     )
 
-    room.title("📚 Project Archive")
-
-    room.geometry("600x500")
-
-
     title = ctk.CTkLabel(
-        room,
-        text="📚 Project Archive",
+        window,
+        text="Project Archive",
         **title_style()
     )
 
-    title.pack(pady=20)
+    title.pack(
+        pady=20
+    )
 
     scroll_frame = ctk.CTkScrollableFrame(
-        room,
+        window,
         width=550,
-        height=380,
+        height=450,
         fg_color=AURORA_DARK
     )
 
@@ -67,14 +46,10 @@ def open_project_room():
         fill="both",
         expand=True,
         padx=20,
-        pady=(0, 20)
+        pady=(0, 10)
     )
 
-
-    data = load_projects()
-
-    projects = data.get("projects", [])
-
+    projects = brain.get_projects()
 
     for project in projects:
 
@@ -92,7 +67,7 @@ def open_project_room():
         info = ctk.CTkLabel(
             card,
             text=(
-                f"🌿 {project['name']}\n"
+                f"{project['name']}\n"
                 f"Type: {project['type']}\n"
                 f"Status: {project['status']}\n"
                 f"Creator: {project['creator']}\n\n"
@@ -117,7 +92,11 @@ def open_project_room():
         task_button = ctk.CTkButton(
             card,
             text="View Tasks",
-            command=lambda p=project: open_project_tasks(p),
+            command=lambda p=project: open_project_tasks(
+                window,
+                brain,
+                p
+            ),
             **button_style()
         )
 
@@ -127,24 +106,33 @@ def open_project_room():
             anchor="w"
         )
 
-def open_project_tasks(project):
-
-    # TEMP CHANGE DELETE LATER 
-    
-    print("PROJECT SENT:")
-    print(project["name"])
-
-    window = ctk.CTkToplevel()
-
-    window.title(
-        f"{project['name']} Quests"
+    back_button = ctk.CTkButton(
+        window,
+        text="Back to Workshop",
+        command=lambda: window.navigation.go_to_workshop(),
+        **button_style()
     )
 
-    window.geometry(
-        "700x600"
+    back_button.pack(
+        pady=15
     )
+
+def return_to_dashboard(window, brain):
+
+    for widget in window.winfo_children():
+        widget.destroy()
+
+    from Interface.workshop_dashboard import show_dashboard
+
+    show_dashboard(
+        window,
+        brain
+    )
+
+def open_project_tasks(window, brain, project):
 
     show_task_list(
         window,
+        brain, 
         project["name"]
     )

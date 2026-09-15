@@ -55,10 +55,6 @@ TASK_FILE = os.path.join(
     "tasks.json"
 )
 
-brain = WorkshopBrain()
-
-brain.awaken()
-
 # =========================================
 # Data Functions
 # =========================================
@@ -67,17 +63,15 @@ brain.awaken()
 # Remove these wrappers after all Task Chamber
 # functions call WorkshopBrain directly.
 
-def load_tasks():
+def load_tasks(brain):
 
     return brain.get_tasks()
 
 
-def save_tasks(tasks):
+def save_tasks(brain, tasks):
 
     brain.tasks["tasks"] = tasks
-
     brain.save_tasks()
-
 
 # =========================================
 # Utility Functions
@@ -88,7 +82,7 @@ def clear_window(window):
     for widget in window.winfo_children():
         widget.destroy()
 
-def create_task_button(parent, main_window, task, symbol):
+def create_task_button(parent, main_window, brain, task, symbol):
 
     # -----------------------------
     # Quest Card
@@ -277,6 +271,7 @@ def create_task_button(parent, main_window, task, symbol):
         width=140,
         command=lambda: show_task_details(
             main_window,
+            brain,
             task
         ),
         **button_style()
@@ -291,7 +286,7 @@ def create_task_button(parent, main_window, task, symbol):
 # Task Actions
 # =========================================
 
-def complete_task(task):
+def complete_task(brain, task):
 
     brain.complete_task(task)
 
@@ -299,15 +294,15 @@ def complete_task(task):
 # Dialogs
 # =========================================
 
-def finish_complete_task(dialog, window, task):
+def finish_complete_task(dialog, window, brain, task):
 
-    complete_task(task)
+    complete_task(brain, task)
 
     dialog.destroy()
 
-    show_task_list(window)
+    show_task_list(window, brain)
 
-def confirm_complete_task(window, task):
+def confirm_complete_task(window, brain, task):
 
     dialog = ctk.CTkToplevel(window)
 
@@ -342,6 +337,7 @@ def confirm_complete_task(window, task):
         command=lambda: finish_complete_task(
             dialog,
             window,
+            brain,
             task
         ),
         **button_style()
@@ -360,15 +356,15 @@ def confirm_complete_task(window, task):
 
     cancel_button.pack()
 
-def finish_delete_task(dialog, window, task):
+def finish_delete_task(dialog, window, brain, task):
 
     brain.delete_task(task)
 
     dialog.destroy()
 
-    show_task_list(window)
+    show_task_list(window, brain)
 
-def confirm_delete_task(window, task):
+def confirm_delete_task(window, brain, task):
 
     dialog = ctk.CTkToplevel(window)
 
@@ -403,6 +399,7 @@ def confirm_delete_task(window, task):
         command=lambda: finish_delete_task(
             dialog,
             window,
+            brain,
             task
         ),
         **button_style()
@@ -424,7 +421,7 @@ def confirm_delete_task(window, task):
 # =========================================
 # Views
 # =========================================
-def show_task_details(window, task):
+def show_task_details(window, brain, task):
 
     apply_theme()
 
@@ -492,7 +489,7 @@ def show_task_details(window, task):
     edit_button = ctk.CTkButton(
         scroll_frame,
         text="Edit Quest",
-        command=lambda: show_edit_task_page(window, task),
+        command=lambda: show_edit_task_page(window, brain, task),
         **button_style()
     )
 
@@ -505,6 +502,7 @@ def show_task_details(window, task):
         text="Remove Quest",
         command=lambda: confirm_delete_task(
             window,
+            brain,
             task
         ),
         **button_style()
@@ -519,6 +517,7 @@ def show_task_details(window, task):
         text="Complete Quest",
         command=lambda: confirm_complete_task(
             window,
+            brain,
             task
         ),
         **button_style()
@@ -531,7 +530,7 @@ def show_task_details(window, task):
     back_button = ctk.CTkButton(
         scroll_frame,
         text="Back to Tasks",
-        command=lambda: show_task_list(window),
+        command=lambda: show_task_list(window, brain),
         **button_style()
     )
 
@@ -539,7 +538,7 @@ def show_task_details(window, task):
         pady=10
     )
 
-def show_completed_tasks(window):
+def show_completed_tasks(window, brain):
 
     clear_window(window)
 
@@ -586,6 +585,7 @@ def show_completed_tasks(window):
         create_task_button(
             scroll_frame,
             window,
+            brain,
             task,
             "✓"
         )
@@ -593,7 +593,7 @@ def show_completed_tasks(window):
     back_button = ctk.CTkButton(
         window,
         text="Back to Task Chamber",
-        command=lambda: show_task_list(window),
+        command=lambda: show_task_list(window, brain),
         **button_style()
     )
 
@@ -601,7 +601,7 @@ def show_completed_tasks(window):
         pady=(0, 20)
     )
 
-def search_tasks(search_text, project=None):
+def search_tasks(brain, search_text, project=None):
 
     tasks = brain.get_tasks()
 
@@ -635,6 +635,7 @@ def search_tasks(search_text, project=None):
 
 def show_task_list(
         window,
+        brain,
         project=None,
         include_title=False,
         search_text=""
@@ -691,6 +692,7 @@ def show_task_list(
         text="Search",
         command=lambda: show_task_list(
             window,
+            brain,
             project,
             include_title,
             search_entry.get()
@@ -705,7 +707,7 @@ def show_task_list(
     new_task_button = ctk.CTkButton(
         window,
         text="New Quest",
-        command=lambda: show_new_task_page(window),
+        command=lambda: show_new_task_page(window, brain),
         **button_style()
     )
 
@@ -716,12 +718,25 @@ def show_task_list(
     completed_button = ctk.CTkButton(
         window,
         text="Completed Records",
-        command=lambda: show_completed_tasks(window),
+        command=lambda: show_completed_tasks(window, brain),
         **button_style()
     )
 
     completed_button.pack(
         pady=(0, 20)
+    )
+
+    back_button = ctk.CTkButton(
+        window,
+
+        text="Back to Workshop",
+        width=220,
+        command=lambda: return_to_dashboard(window),
+        **button_style()
+    )
+
+    back_button.pack(
+        pady=(0, 10)
     )
 
     scroll_frame = ctk.CTkScrollableFrame(
@@ -745,6 +760,7 @@ def show_task_list(
     if search_text:
 
         tasks = search_tasks(
+            brain,
             search_text,
             project
         )
@@ -785,12 +801,14 @@ def show_task_list(
         create_task_button(
             scroll_frame,
             window,
+            brain,
             task,
             "○"
         )
 
 def create_new_task(
     window,
+    brain,
     title_entry,
     project_entry,
     priority_menu,
@@ -813,9 +831,9 @@ def create_new_task(
 
     brain.add_task(new_task)
 
-    show_task_list(window)
+    show_task_list(window, brain)
 
-def show_new_task_page(window):
+def show_new_task_page(window, brain):
 
     clear_window(window)
 
@@ -969,6 +987,7 @@ def show_new_task_page(window):
         text="Create Quest",
         command=lambda: create_new_task(
             window,
+            brain,
             quest_title_entry,
             project_entry,
             priority_menu,
@@ -984,14 +1003,14 @@ def show_new_task_page(window):
     back_button = ctk.CTkButton(
         scroll_frame,
         text="← Back",
-        command=lambda: show_task_list(window),
+        command=lambda: show_task_list(window, brain),
         **button_style()
     )
     
     back_button.pack(pady=20)
     
 
-def show_edit_task_page(window, task):
+def show_edit_task_page(window, brain, task):
 
     clear_window(window)
 
@@ -1132,6 +1151,7 @@ def show_edit_task_page(window, task):
         text="Save Changes",
         command=lambda: save_edited_task(
             window,
+            brain, 
             task,
             quest_title_entry,
             project_entry,
@@ -1147,6 +1167,7 @@ def show_edit_task_page(window, task):
 
 def save_edited_task(
     window,
+    brain,
     old_task,
     title_entry,
     project_entry,
@@ -1185,20 +1206,34 @@ def save_edited_task(
     )
 
 
-    show_task_list(window)
+    show_task_list(window, brain)
+
+def return_to_dashboard(window):
+
+    navigation = getattr(
+        window,
+        "navigation",
+        None
+    )
+
+    if navigation:
+
+        navigation.go_to_workshop()
 
 # =========================================
 # Launcher
 # =========================================
 
-def open_task_chamber():
+def open_task_chamber(window, brain):
 
-    window = ctk.CTkToplevel()
+    clear_window(window)
 
-    window.title("Task Chamber")
-    window.geometry("700x600")
+    window.configure(
+        fg_color=AURORA_DARK
+    )
 
     show_task_list(
         window,
+        brain,
         include_title=False
     )
