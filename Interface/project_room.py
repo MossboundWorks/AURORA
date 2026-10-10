@@ -131,8 +131,7 @@ def return_to_dashboard(window, brain):
 
 def open_project_tasks(window, brain, project):
 
-    show_task_list(
-        window,
-        brain, 
+    window.navigation.show(
+        show_task_list,
         project["name"]
     )
