@@ -28,13 +28,76 @@ def welcome_command():
 
     print()
 
+def history_command():
+
+    brain.awaken()
+
+    history = brain.get_workshop_history()
+
+    print()
+
+    print("Workshop History")
+    print("----------------------------")
+
+    if not history:
+
+        print()
+        print("No completed Workshop sessions found.")
+        print()
+
+        return
+
+    print()
+
+    for session in history:
+
+        print(
+            f"Project: {session['project']}"
+        )
+
+        if session["task"]:
+
+            print(
+                f"Task: {session['task']}"
+            )
+
+        print(
+            f"Started: {session['started']}"
+        )
+
+        print(
+            f"Ended: {session['ended']}"
+        )
+
+        print(
+            f"Status: {session['status']}"
+        )
+
+        if session["accomplishments"]:
+
+            print("Accomplishments:")
+
+            for accomplishment in session["accomplishments"]:
+
+                print(
+                    f"  - {accomplishment}"
+                )
+
+        if session["next_step"]:
+
+            print(
+                f"Next Step: {session['next_step']}"
+            )
+
+        print()
+
 def reflect_command():
 
     brain.awaken()
 
     print()
 
-    print("🌿 Workshop Reflection")
+    print("Workshop Reflection")
     print("----------------------------")
 
     print()
@@ -44,17 +107,17 @@ def reflect_command():
     if summary["current_focus"]:
 
         print(
-            f"🎯 Current Focus: {summary['current_focus']}"
+            f"Current Focus: {summary['current_focus']}"
         )
 
         print(
-            f"📚 Project: {summary['project']}"
+            f"Project: {summary['project']}"
         )
 
         print()
 
         print(
-            f"💡 Reason:"
+            f"Reason:"
         )
 
         print(
@@ -64,12 +127,12 @@ def reflect_command():
     else:
 
         print(
-            "🌱 No current focus detected."
+            "No current focus detected."
         )
 
     print()
 
-    print("🌿 Observations")
+    print("Observations")
 
     print()
 
@@ -79,7 +142,7 @@ def reflect_command():
 
     print()
 
-    print("💡 Recommendation")
+    print("Recommendation")
 
     print()
 

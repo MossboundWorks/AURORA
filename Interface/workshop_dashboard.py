@@ -196,26 +196,25 @@ def show_dashboard(window, brain):
         pady=10
     )
 
+    navigation = window.navigation
+
     buttons = [
         (
             "Projects",
-            lambda: open_project_room(
-                window,
-                brain
+            lambda: navigation.show(
+                open_project_room
             )
         ),
         (
             "Tasks",
-            lambda: open_task_chamber(
-                window,
-                brain
+            lambda: navigation.show(
+                open_task_chamber
             )
         ),
         (
             "Reflection",
-            lambda: show_reflection(
-                window,
-                brain
+            lambda: navigation.show(
+                show_reflection
             )
         ),
     ]

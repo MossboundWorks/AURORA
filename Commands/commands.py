@@ -17,7 +17,8 @@ from Commands.workshop import (
     welcome_command,
     reflect_command,
     health_command,
-    record_command
+    record_command,
+    history_command
 )
 
 from Commands.tasks import (
@@ -58,5 +59,6 @@ COMMANDS = {
     "garden": garden_command,
     "search": search_command,
     "work": work_command,
-    "end work": end_work_command
+    "end work": end_work_command,
+    "history": history_command
 }

@@ -269,9 +269,8 @@ def create_task_button(parent, main_window, brain, task, symbol):
         card,
         text="Access Record",
         width=140,
-        command=lambda: show_task_details(
-            main_window,
-            brain,
+        command=lambda: main_window.navigation.show(
+            show_task_details,
             task
         ),
         **button_style()
@@ -530,7 +529,7 @@ def show_task_details(window, brain, task):
     back_button = ctk.CTkButton(
         scroll_frame,
         text="Back to Tasks",
-        command=lambda: show_task_list(window, brain),
+        command=lambda: window.navigation.back(),
         **button_style()
     )
 

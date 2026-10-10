@@ -20,8 +20,6 @@ USER_FILE = os.path.join(
 
 from datetime import datetime
 
-from Core.session_manager import SessionManager
-
 from Core.session_controller import SessionController
 
 class WorkshopBrain:
@@ -133,18 +131,6 @@ class WorkshopBrain:
             "tasks",
             []
         )
-
-    def get_completed_tasks(self):
-
-        completed_tasks = []
-
-        for task in self.get_tasks():
-
-            if task.get("completed", False):
-
-                completed_tasks.append(task)
-
-        return completed_tasks
 
     def get_completed_tasks(self):
 
@@ -288,9 +274,6 @@ class WorkshopBrain:
             task["project"]
         )
 
-        project_type: "Unknown"
-
-
         project_type = "Unknown"
 
         if project:
@@ -393,21 +376,103 @@ class WorkshopBrain:
 
     def get_project_history(self, project_name):
 
+        history = self.get_workshop_history(
+            limit=1000
+        )
+
+        project_history = []
+
+        for session in history:
+
+            if session["project"] == project_name:
+
+                project_history.append(session)
+
+        return project_history
+
+    def get_last_session(self):
+
+        return self.session_manager.get_last_session()
+
+    def get_recent_sessions(self, limit=5):
+
         sessions = self.session_manager.get_sessions()
+
+        if not sessions:
+            return []
+
+        completed = []
+
+        for session in sessions:
+
+            if session.get("status") == "Completed":
+
+                completed.append(session)
+
+        return completed[-limit:]
+
+    def get_workshop_history(self, limit=5):
+
+        sessions = self.get_recent_sessions(limit)
 
         history = []
 
         for session in sessions:
 
-            if session.get("project") == project_name:
+            history.append({
+                "session_id": session.get(
+                    "id"
+                ),
 
-                history.append(session)
+                "project": session.get(
+                    "project",
+                    "Unknown"
+                ),
 
-            return history
+                "task": session.get(
+                    "task",
+                    ""
+                ),
 
-    def get_last_session(self):
+                "started": session.get(
+                    "started",
+                    ""
+                ),
 
-        return self.session_manager.get_last_session()
+                "ended": session.get(
+                    "ended",
+                    ""
+                ),
+
+                "status": session.get(
+                    "status",
+                    "Unknown"
+                ),
+
+                "accomplishments": session.get(
+                    "accomplishments",
+                    []
+                ),
+
+                "next_step": session.get(
+                    "next_step",
+                    ""
+                )
+            })
+
+        return history
+
+    def get_recent_journal_entries(self, limit=5):
+
+        entries = self.journal.get(
+            "entries",
+            []
+        )
+
+        if not entries:
+            return []
+
+        return entries[-limit:]
 
     def get_current_work(self):
 
@@ -440,15 +505,6 @@ class WorkshopBrain:
             return None
 
         self.record_session()
-
-        return session
-
-    def get_work_status(self):
-
-        session = self.session_controller.get_work_context()
-
-        if not session:
-            return None
 
         return session
 
@@ -867,7 +923,7 @@ class WorkshopBrain:
         if not session:
 
             return (
-                "Welcome back, {self.get_user()}. "
+                f"Welcome back, {self.get_user()}. "
                 "The Workshop is ready for a new beginning."
             )
 
@@ -938,7 +994,7 @@ class WorkshopBrain:
 
 
         message += (
-            "\nThe Workshop is ready to continue growing."
+            "\nThe workshop is ready to continue growing."
         )
 
 

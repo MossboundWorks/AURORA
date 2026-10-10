@@ -27,9 +27,9 @@ TASK_FILE = os.path.join(
     "tasks.json"
 )
 
-from project_room import open_project_room
-from memory_room import open_memory_room
-from Interface.task_chamber import open_task_room
+from Interface.project_room import open_project_room
+from Interface.memory_room import open_memory_room
+from Interface.task_chamber import open_task_chamber
 from Design.aurora_theme import (
     apply_theme,
     title_style,
@@ -108,7 +108,6 @@ message.pack(pady=20)
 project_button = ctk.CTkButton(
     window,
     text="📚 Projects",
-    font=("Arial", 16),
     command=open_project_room,
     **button_style()
 )
@@ -119,8 +118,7 @@ project_button.pack(pady=10)
 task_button = ctk.CTkButton(
     window,
     text="📋 Tasks",
-    font=("Arial", 16),
-    command=open_task_room,
+    command=open_task_chamber,
     **button_style()
 )
 
@@ -130,7 +128,6 @@ task_button.pack(pady=10)
 memory_button = ctk.CTkButton(
     window,
     text="🌱 Memory Garden",
-    font=("Arial", 16),
     command=open_memory_room,
     **button_style()
 )
